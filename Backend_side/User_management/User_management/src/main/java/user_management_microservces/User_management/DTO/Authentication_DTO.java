@@ -1,17 +1,15 @@
 package user_management_microservces.User_management.DTO;
 
 import lombok.*;
+import org.springframework.stereotype.Component;
 
-import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Dto_User {
-    private String name;
-    private Date date;
+public class Authentication_DTO {
+    private String username;
     private String mail;
-    private String bio;
-
+    private String password;
 }
