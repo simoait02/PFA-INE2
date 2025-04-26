@@ -18,6 +18,8 @@ public class Service_Management {
     private Mapper_Users mapper;
     @Autowired
     private Jpa_Users jpaUsers;
+    @Autowired
+    private  Jwt_Validator jwtValidator;
 
     public List<Dto_User> getUsers(){
         return this.jpaUsers.findAll()
@@ -45,6 +47,24 @@ public class Service_Management {
     public void DeleteUser(int id){
         this.jpaUsers.deleteById(id);
     }
+    public boolean TokenValidation(String token){
+        String username =this.jwtValidator.extractSubject(token);
+        Users users=this.jpaUsers.findByMail(username).get();
+        if(this.jwtValidator.validateToken(token,users.getUsername())){
+            return true;
+        }
+        return false;
+    }
+    public String ExtractToken(String header){
+        if(header!=null && header.startsWith("Bearer ")){
+            return header.substring(7);
+        }
+        throw  new IllegalArgumentException(" No VALID TOEKN");
+    }
+    public String ExtractMail(String token){
+        return this.jwtValidator.extractSubject(token);
+    }
+
 
 
 

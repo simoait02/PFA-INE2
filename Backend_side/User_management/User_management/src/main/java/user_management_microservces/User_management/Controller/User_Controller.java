@@ -23,14 +23,16 @@ public class User_Controller {
         return ResponseEntity.ok(this.serviceManagement.getSingleUser(id));
     }
     @GetMapping("/me")
-    public ResponseEntity<Dto_User> getMyAccount(@RequestBody Authentication_DTO authenticationDto){
-        return ResponseEntity.ok(this.serviceManagement.getMyAccount(authenticationDto.getMail()));
+    public ResponseEntity<Dto_User> getMyAccount(@RequestHeader("Authorization") String auth) {
+        auth=this.serviceManagement.ExtractToken(auth);
+        return ResponseEntity.ok(this.serviceManagement.getMyAccount(this.serviceManagement.ExtractMail(auth)));
+
     }
-    @PostMapping("/register")
+    /*@PostMapping("/register")
     public ResponseEntity CreateAccount(@RequestBody Authentication_DTO authenticationDto){
         this.serviceManagement.CreateUser(authenticationDto);
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).build();
-    }
+    }*/
     @PutMapping("/me")
     public ResponseEntity<Dto_User> UpdateMyAccount(@RequestBody Dto_User user){
         return ResponseEntity.ok(this.serviceManagement.ModifyUser(user));
