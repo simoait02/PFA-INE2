@@ -14,16 +14,16 @@ public class Mapper_Users {
                 .mail(user.getMail())
                 .bio(user.getBio())
                 .date(user.getDate())
+                .id(user.getId())
                 .build();
     }
 
-    public Users toUser(Dto_User user){
-        return Users.builder()
-                .username(user.getName())
-                .bio(user.getBio())
-                .mail(user.getMail())
-                .date(user.getDate())
-                .build();
+    public void updateFromDto(Users users,Dto_User dtoUser){
+        if(dtoUser.getName()!=null) users.setUsername(dtoUser.getName());
+        if(dtoUser.getBio()!=null) users.setBio(dtoUser.getBio());
+        if(dtoUser.getDate()!=null) users.setDate(dtoUser.getDate());
+        if(dtoUser.getMail()!=null) users.setMail(dtoUser.getMail());
+
     }
     public Users toUser_authentication(Authentication_DTO authenticationDto){
         Users users=Users.builder()

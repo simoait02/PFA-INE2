@@ -9,6 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Dto_User {
+    private Integer id;
     private String name;
     private Date date;
     private String mail;
