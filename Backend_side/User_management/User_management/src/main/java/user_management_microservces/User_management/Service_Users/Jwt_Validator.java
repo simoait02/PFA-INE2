@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -16,17 +17,10 @@ import java.util.function.Function;
 
 @Service
 public class Jwt_Validator {
-    private String secretkey="";
+    @Value("${jwt.secret}")
+    public String secretkey;
 
-    public Jwt_Validator()  {
-        try {
-            KeyGenerator keyGenerator= KeyGenerator.getInstance("HmacSHA256");
-            SecretKey key= keyGenerator.generateKey();
-            secretkey= Base64.getEncoder().encodeToString(key.getEncoded());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
     private SecretKey getkey() {
         byte[] key= Decoders.BASE64.decode(secretkey);
         return Keys.hmacShaKeyFor(key);

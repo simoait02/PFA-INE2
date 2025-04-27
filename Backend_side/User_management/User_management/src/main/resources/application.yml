@@ -13,3 +13,5 @@ spring:
     password: ${DB_PASSWORD}
 server:
   port: 8070
+jwt:
+  secret: "U29tZVN1cGVyU2VjdXJlS2V5Rm9yTXlKd3RBdXRoZW50aWNhdGlvbg=="

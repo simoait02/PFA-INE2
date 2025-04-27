@@ -34,6 +34,14 @@ public class Service_Management {
    public Dto_User getMyAccount(String mail){
         return this.mapper.toDtoUser(this.jpaUsers.findByMail(mail).get());
    }
+   public Authentication_DTO getMyAccountForLogin(String mail){
+        Users user =this.jpaUsers.findByMail(mail).get();
+        return Authentication_DTO.builder()
+                .mail(mail)
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .build();
+   }
 
     public void CreateUser(Authentication_DTO user){
         this.jpaUsers.save(this.mapper.toUser_authentication(user));
@@ -50,7 +58,7 @@ public class Service_Management {
     public boolean TokenValidation(String token){
         String username =this.jwtValidator.extractSubject(token);
         Users users=this.jpaUsers.findByMail(username).get();
-        if(this.jwtValidator.validateToken(token,users.getUsername())){
+        if(this.jwtValidator.validateToken(token,users.getMail())){
             return true;
         }
         return false;

@@ -20,8 +20,8 @@ public class JwtController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Dto_User> Login(@RequestBody Authentication_DTO authenticationDto){
-        return ResponseEntity.ok(this.serviceManagement.getMyAccount(authenticationDto.getMail()));
+    public ResponseEntity<Authentication_DTO> Login(@RequestBody Authentication_DTO authenticationDto){
+        return ResponseEntity.ok(this.serviceManagement.getMyAccountForLogin(authenticationDto.getMail()));
     }
     @GetMapping("/validate/{token}")
     public ResponseEntity<String> isValidate(@PathVariable String token){
