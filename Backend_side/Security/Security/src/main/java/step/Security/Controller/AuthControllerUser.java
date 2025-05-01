@@ -3,8 +3,9 @@ package step.Security.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import step.Security.Models.Authenticated_User;
 import step.Security.Services.UserServiceAuth;
+import step.Security.payload.LoginRequest;
+import step.Security.payload.RegisterRequest;
 
 @RestController
 @RequestMapping("auth/users")
@@ -12,12 +13,12 @@ public class AuthControllerUser {
     @Autowired
     private UserServiceAuth userServiceAuth;
     @PostMapping("/register")
-    public void Create(@RequestBody Authenticated_User authenticatedUser){
+    public void Create(@RequestBody RegisterRequest authenticatedUser){
         this.userServiceAuth.Save(authenticatedUser);
     }
     @PostMapping("/login")
-    public ResponseEntity<String> Login(@RequestBody Authenticated_User authenticatedUser){
-        return ResponseEntity.ok(this.userServiceAuth.Verify(authenticatedUser));
+    public ResponseEntity<String> Login(@RequestBody LoginRequest authenticatedUser){
+        return ResponseEntity.ok(this.userServiceAuth.verify(authenticatedUser));
 
     }
     @GetMapping("/validate/{token}")

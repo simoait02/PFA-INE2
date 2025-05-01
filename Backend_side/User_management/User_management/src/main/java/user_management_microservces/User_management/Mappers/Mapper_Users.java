@@ -1,34 +1,39 @@
 package user_management_microservces.User_management.Mappers;
 
 import org.springframework.stereotype.Component;
-import user_management_microservces.User_management.DTO.Authentication_DTO;
-import user_management_microservces.User_management.DTO.Dto_User;
+import user_management_microservces.User_management.DTO.dtoUser;
 import user_management_microservces.User_management.Enities.Users;
+import user_management_microservces.User_management.DTO.AccountDetails;
 
 @Component
 public class Mapper_Users {
 
-    public Dto_User toDtoUser(Users user){
-        return Dto_User.builder()
+    public dtoUser toDtoUser(Users user){
+        return dtoUser.builder()
                 .name(user.getUsername())
-                .mail(user.getMail())
+                .mail(user.getEmail())
                 .bio(user.getBio())
-                .date(user.getDate())
+                .date(user.getBirthDate())
                 .id(user.getId())
                 .build();
     }
 
-    public void updateFromDto(Users users,Dto_User dtoUser){
+    public void updateFromDto(Users users, dtoUser dtoUser){
         if(dtoUser.getName()!=null) users.setUsername(dtoUser.getName());
         if(dtoUser.getBio()!=null) users.setBio(dtoUser.getBio());
-        if(dtoUser.getDate()!=null) users.setDate(dtoUser.getDate());
-        if(dtoUser.getMail()!=null) users.setMail(dtoUser.getMail());
+        if(dtoUser.getDate()!=null) users.setBirthDate(dtoUser.getDate());
+        if(dtoUser.getMail()!=null) users.setEmail(dtoUser.getMail());
 
     }
-    public Users toUser_authentication(Authentication_DTO authenticationDto){
+    public Users toUser_authentication(AccountDetails authenticationDto){
         Users users=Users.builder()
-                .mail(authenticationDto.getMail())
+                .email(authenticationDto.getEmail())
                 .password(authenticationDto.getPassword())
+                .bio(authenticationDto.getBio())
+                .birthDate(authenticationDto.getBirthDate())
+                .phoneNumber(authenticationDto.getPhoneNumber())
+                .role(authenticationDto.getRole())
+                .username(authenticationDto.getUsername())
                 .build();
         if(authenticationDto.getUsername()!=null){
             users.setUsername(authenticationDto.getUsername());

@@ -18,10 +18,14 @@ public class Users  implements Behavior{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String username;
-    private String mail;
-    private Date date;
+    private String email;
+    private Date birthDate;
+    @Column(unique = true)
+    private String phoneNumber;
     private String password;
     private String bio;
+    private Roles role;
+
     @Override
     public void CreateChanel() {
 

@@ -8,7 +8,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Dto_User {
+public class dtoUser {
     private Integer id;
     private String name;
     private Date date;

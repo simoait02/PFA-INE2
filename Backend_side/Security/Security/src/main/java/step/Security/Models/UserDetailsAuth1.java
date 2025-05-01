@@ -2,12 +2,13 @@ package step.Security.Models;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import step.Security.payload.RegisterRequest;
 
 import java.util.Collection;
 
 public class UserDetailsAuth1 implements UserDetails {
-    private Authenticated_User authenticatedUser;
-    public UserDetailsAuth1(Authenticated_User user){
+    private RegisterRequest authenticatedUser;
+    public UserDetailsAuth1(RegisterRequest user){
         this.authenticatedUser=user;
     }
     @Override
@@ -22,7 +23,7 @@ public class UserDetailsAuth1 implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.authenticatedUser.getMail();
+        return this.authenticatedUser.getEmail();
     }
 
     @Override

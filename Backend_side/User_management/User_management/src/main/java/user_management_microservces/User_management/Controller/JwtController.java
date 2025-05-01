@@ -1,32 +1,39 @@
 package user_management_microservces.User_management.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import user_management_microservces.User_management.DTO.Authentication_DTO;
-import user_management_microservces.User_management.DTO.Dto_User;
+import user_management_microservces.User_management.DTO.LoginRequest;
+import user_management_microservces.User_management.DTO.dtoUser;
 import user_management_microservces.User_management.Service_Users.Service_Management;
+import user_management_microservces.User_management.DTO.AccountDetails;
 
 @RestController
 @RequestMapping("/api/users/auth")
 public class JwtController {
-    @Autowired
-    private Service_Management serviceManagement;
+
+    private final Service_Management userService;
+
+    public JwtController(Service_Management userService) {
+        this.userService = userService;
+    }
+
     @PostMapping("/register")
-    public ResponseEntity CreateAccount(@RequestBody Authentication_DTO authenticationDto){
-        this.serviceManagement.CreateUser(authenticationDto);
-        return ResponseEntity.status(HttpStatusCode.valueOf(201)).build();
+    public ResponseEntity<Void> createAccount(@RequestBody AccountDetails accountDetails) {
+        userService.createUser(accountDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Authentication_DTO> Login(@RequestBody Authentication_DTO authenticationDto){
-        return ResponseEntity.ok(this.serviceManagement.getMyAccountForLogin(authenticationDto.getMail()));
-    }
-    @GetMapping("/validate/{token}")
-    public ResponseEntity<String> isValidate(@PathVariable String token){
-        if(this.serviceManagement.TokenValidation(token)) return ResponseEntity.ok("VALID");
-        throw new RuntimeException("TOKEN IS NOT VALID");
+    public ResponseEntity<dtoUser> login(@RequestBody LoginRequest accountDetails) {
+        return ResponseEntity.ok(userService.getUserByEmail(accountDetails.getIdentification()));
     }
 
+    @GetMapping("/validate/{token}")
+    public ResponseEntity<String> validateToken(@PathVariable String token) {
+        if (userService.validateToken(token)) {
+            return ResponseEntity.ok("VALID");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("TOKEN IS NOT VALID");
+    }
 }

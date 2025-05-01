@@ -1,83 +1,101 @@
 package user_management_microservces.User_management.Service_Users;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import user_management_microservces.User_management.DTO.Authentication_DTO;
-import user_management_microservces.User_management.DTO.Dto_User;
+import user_management_microservces.User_management.DTO.dtoUser;
 import user_management_microservces.User_management.Dao.Jpa_Users;
 import user_management_microservces.User_management.Enities.Users;
 import user_management_microservces.User_management.Mappers.Mapper_Users;
+import user_management_microservces.User_management.DTO.AccountDetails;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.util.NoSuchElementException;
+
 @Service
 public class Service_Management {
-    @Autowired
-    private Mapper_Users mapper;
-    @Autowired
-    private Jpa_Users jpaUsers;
-    @Autowired
-    private  Jwt_Validator jwtValidator;
+    private final Mapper_Users userMapper;
+    private final Jpa_Users userRepository;
+    private final Jwt_Validator jwtValidator;
 
-    public List<Dto_User> getUsers(){
-        return this.jpaUsers.findAll()
+    public Service_Management(Mapper_Users userMapper, Jpa_Users userRepository, Jwt_Validator jwtValidator) {
+        this.userMapper = userMapper;
+        this.userRepository = userRepository;
+        this.jwtValidator = jwtValidator;
+    }
+
+    public List<dtoUser> getAllUsers() {
+        return userRepository.findAll()
                 .stream()
-                .map(mapper::toDtoUser)
+                .map(userMapper::toDtoUser)
                 .collect(Collectors.toList());
     }
 
-    public Dto_User getSingleUser(int id){
-        return this.mapper.toDtoUser(this.jpaUsers.findById(id).get());
+    public dtoUser getUserById(int id) {
+        return userRepository.findById(id)
+                .map(userMapper::toDtoUser)
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
     }
-   public Dto_User getMyAccount(String mail){
-        return this.mapper.toDtoUser(this.jpaUsers.findByMail(mail).get());
-   }
-   public Authentication_DTO getMyAccountForLogin(String mail){
-        Users user =this.jpaUsers.findByMail(mail).get();
-        return Authentication_DTO.builder()
-                .mail(mail)
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .build();
-   }
 
-    public void CreateUser(Authentication_DTO user){
-        this.jpaUsers.save(this.mapper.toUser_authentication(user));
+    public dtoUser getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(userMapper::toDtoUser)
+                .orElseThrow(() -> new NoSuchElementException("User not found with email: " + email));
     }
-    public Dto_User ModifyUser(Dto_User user){
-        Users users=this.jpaUsers.findById(user.getId()).get();
-        this.mapper.updateFromDto(users,user);
-        this.jpaUsers.save(users);
-        return this.mapper.toDtoUser(users);
-    }
-    public void DeleteUser(int id){
-        this.jpaUsers.deleteById(id);
-    }
-    public boolean TokenValidation(String token){
-        String username =this.jwtValidator.extractSubject(token);
-        Users users=this.jpaUsers.findByMail(username).get();
-        if(this.jwtValidator.validateToken(token,users.getMail())){
-            return true;
+
+    public AccountDetails getAccountDetailsForLogin(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
         }
-        return false;
+
+        return userRepository.findByEmail(email)
+                .map(user -> AccountDetails.builder()
+                        .email(email)
+                        .username(user.getUsername())
+                        .password(user.getPassword())
+                        .bio(user.getBio())
+                        .role(user.getRole())
+                        .birthDate(user.getBirthDate())
+                        .phoneNumber(user.getPhoneNumber())
+                        .build())
+                .orElseThrow(() -> new NoSuchElementException("User not found with email: " + email));
     }
-    public String ExtractToken(String header){
-        if(header!=null && header.startsWith("Bearer ")){
+
+    public void createUser(AccountDetails userDetails) {
+        Users user = userMapper.toUser_authentication(userDetails);
+        userRepository.save(user);
+    }
+
+    public dtoUser updateUser(dtoUser userDto) {
+        Users user = userRepository.findById(userDto.getId())
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userDto.getId()));
+
+        userMapper.updateFromDto(user, userDto);
+        userRepository.save(user);
+
+        return userMapper.toDtoUser(user);
+    }
+
+    public void deleteUser(int id) {
+        userRepository.deleteById(id);
+    }
+
+    public boolean validateToken(String token) {
+        String email = jwtValidator.extractSubject(token);
+        return userRepository.findByEmail(email)
+                .map(user -> jwtValidator.validateToken(token, user.getEmail()))
+                .orElse(false);
+    }
+
+    public String extractTokenFromHeader(String header) {
+        if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
-        throw  new IllegalArgumentException(" No VALID TOEKN");
-    }
-    public String ExtractMail(String token){
-        return this.jwtValidator.extractSubject(token);
+        throw new IllegalArgumentException("Invalid authorization header");
     }
 
-
-
-
-
-
-
-
+    public String extractEmailFromToken(String token) {
+        return jwtValidator.extractSubject(token);
+    }
 }
