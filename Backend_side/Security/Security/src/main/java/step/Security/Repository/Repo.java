@@ -1,7 +1,6 @@
 package step.Security.Repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -49,12 +48,19 @@ public class Repo {
         }
     }
 
-    public String Validation(String token) {
+    public String validateToken(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("Token cannot be null");
+        }
+        final String TOKEN_PATTERN = "^[A-Za-z0-9\\-_.]+$";
+        if (!token.matches(TOKEN_PATTERN)) {
+            throw new IllegalArgumentException("Invalid token format: must contain only alphanumeric characters, hyphens, underscores, or periods");
+        }
         String url = this.Validate_Url + token;
         ResponseEntity<String> response = this.restTemplate.getForEntity(url, String.class);
-        if (response.getStatusCode() == HttpStatus.OK) {
+        if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         }
-        throw new RuntimeException("TOKEN NOT VALIDATE");
+        throw new RuntimeException("Token validation failed with status: " + response.getStatusCode());
     }
 }

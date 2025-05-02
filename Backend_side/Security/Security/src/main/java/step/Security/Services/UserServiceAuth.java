@@ -58,8 +58,8 @@ public class UserServiceAuth {
         authenticatedUser.setPassword(bCryptPasswordEncoder.encode(authenticatedUser.getPassword()));
         this.repo.CreateUser(authenticatedUser);
     }
-    public String Validation(String token){
-        return this.repo.Validation(token);
+    public String validation(String token){
+        return this.repo.validateToken(token);
     }
 
 }
